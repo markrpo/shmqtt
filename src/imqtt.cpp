@@ -23,6 +23,7 @@ void MQTT::notify_observers(std::string topic, std::string message){
 	}
 }
 
+// Maybe add a mutex to protect the MQTTClient_publishMessage
 void MQTT::publish(std::string topic, std::string message){
 	MQTTClient_message pubmsg = MQTTClient_message_initializer;
 	pubmsg.payload = (void *)message.c_str();
