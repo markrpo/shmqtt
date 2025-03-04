@@ -33,15 +33,23 @@ else()
 	message(FATAL_ERROR "libpaho-mqtt3a not found")
 endif()
 
+if (PAHO_MQTT_C_INCLUDE_DIR AND PAHO_MQTT_C_LIBRARIES)
+	message(STATUS "Found libpaho-mqtt3c")
+	message(STATUS "Include dir: ${PAHO_MQTT_C_INCLUDE_DIR}")
+	message(STATUS "Library: ${PAHO_MQTT_C_LIBRARIES}")
+else()
+	message(FATAL_ERROR "libpaho-mqtt3c not found")
+endif()
+
 # Set sources and headers files
-set(SOURCES src/mainCasync.cpp)
-set(HEADERS)
+set(SOURCES src/imqtt.cpp)
+set(HEADERS src/imqtt.hpp)
 
 # Add executable
 add_executable(shmqtt ${SOURCES} ${HEADERS})
 
 # Include directories PRIVATE means only this target can see the include directories
-target_include_directories(shmqtt PRIVATE include ${PAHO_MQTT_CA_INCLUDE_DIR})
+target_include_directories(shmqtt PRIVATE include ${PAHO_MQTT_C_INCLUDE_DIR})
 
 # Link libraries
-target_link_libraries(shmqtt PRIVATE  ${PAHO_MQTT_CA_LIBRARIES})
+target_link_libraries(shmqtt PRIVATE  ${PAHO_MQTT_C_LIBRARIES})
