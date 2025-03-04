@@ -23,7 +23,7 @@ public:
 	//virtual void disconnect() = 0;
 	//virtual void subscribe(std::string topic) = 0;
 	//virtual void unsubscribe(std::string topic) = 0;
-	//virtual void publish(std::string topic, std::string message) = 0;
+	virtual void publish(std::string topic, std::string message) = 0;
 	virtual void add_observer(Observer* observer) = 0;
 	virtual void remove_observer(Observer* observer) = 0;
 	virtual void notify_observers(std::string topic, std::string message) = 0;
@@ -37,7 +37,7 @@ public:
 	//void disconnect();
 	//void subscribe(std::string topic);
 	//void unsubscribe(std::string topic);
-	//void publish(std::string topic, std::string message);
+	void publish(std::string topic, std::string message);
 	void add_observer(Observer* observer);
 	void remove_observer(Observer* observer);
 	void notify_observers(std::string topic, std::string message);
@@ -62,9 +62,10 @@ private:
 
 class MQTTObserver : public Observer {
 public:
-	MQTTObserver(std::string name);
+	MQTTObserver(std::string name, IMQTT* mqtt);
 	void update(std::string topic, std::string message);
 
 private:
 	std::string m_name;
+	IMQTT* m_mqtt;
 };

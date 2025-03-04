@@ -23,6 +23,19 @@ void MQTT::notify_observers(std::string topic, std::string message){
 	}
 }
 
+void MQTT::publish(std::string topic, std::string message){
+	MQTTClient_message pubmsg = MQTTClient_message_initializer;
+	pubmsg.payload = (void *)message.c_str();
+	pubmsg.payloadlen = message.length();
+	pubmsg.qos = 0;
+	pubmsg.retained = 0;
+	MQTTClient_deliveryToken token;
+	int rc = MQTTClient_publishMessage(m_client, topic.c_str(), &pubmsg, &token);
+	if(rc != MQTTCLIENT_SUCCESS){
+		std::cout << "Failed to publish message, return code: " << rc << std::endl;
+	}
+}
+
 int MQTT::message_arrived(void *context, char *topicName, int topicLen, MQTTClient_message *message){
 	std::cout << "Message arrived" << std::endl;
 
@@ -136,8 +149,9 @@ void MQTT::connect(){
 
 }
 
-MQTTObserver::MQTTObserver(std::string name){
+MQTTObserver::MQTTObserver(std::string name, IMQTT *mqtt){
 	m_name = name;
+	m_mqtt = mqtt;
 }
 
 
@@ -145,12 +159,15 @@ void MQTTObserver::update(std::string topic, std::string message){
 	std::cout << "Observer: " << m_name << std::endl;
 	std::cout << "Topic: " << topic << std::endl;
 	std::cout << "Message: " << message << std::endl;
+	m_mqtt->publish("test2", "Hello from observer " + m_name);
 }
 
 int main(){
 	MQTT mqtt("tcp://localhost:1883", "test");
-	MQTTObserver observer1("Observer1");
-	MQTTObserver observer2("Observer2");
+	MQTTObserver observer1("Observer1", &mqtt); // MQTTObserver is an observer receives objects of type IMQTT
+												// even if mqtt is of type MQTT, it is derived from IMQTT
+												// so it can be passed to the constructor of MQTTObserver
+	MQTTObserver observer2("Observer2", &mqtt);
 
 	mqtt.add_observer(&observer1);
 	mqtt.add_observer(&observer2);
